@@ -36,25 +36,26 @@ __language__ = __settings__.getLocalizedString
 if (__name__ == "__main__" ):
     utils.log('v%s started' % __settings__.getAddonInfo("version"), xbmc.LOGNOTICE)
     HANDLE = int(sys.argv[1])
-    # if not (__settings__.getSetting("firstrun")):
-        # __settings__.openSettings()
+    if not (__settings__.getSetting("firstrun")):
+        utils.import_settings(__settings__)
+        __settings__.openSettings()
         # if utils.pass_setup_test(SABNZBD.setup_streaming(), __settings__.getSetting("sabnzbd_incomplete")):
-            # __settings__.setSetting("firstrun", '1')
-    # else:
-    if (not sys.argv[2]):
-        page.Page().page_main()
+        __settings__.setSetting("firstrun", '1')
     else:
-        params = utils.get_parameters(sys.argv[2])
-        get = params.get
-        mode = get("mode")
-        try:
-            if mode.startswith("page_"):
-                getattr(page.Page(**params), mode)()    
-            if mode.startswith("nzo_"):
-                getattr(action.NzoAction(**params), mode)()
-            if mode.startswith("nzf_"):
-                getattr(action.NzfAction(**params), mode)()
-            if mode.startswith("sab_"):
-                getattr(action.SabAction(**params), mode)()
-        except AttributeError:
-            utils.notification("Page missing")
+        if (not sys.argv[2]):
+            page.Page().page_main()
+        else:
+            params = utils.get_parameters(sys.argv[2])
+            get = params.get
+            mode = get("mode")
+            try:
+                if mode.startswith("page_"):
+                    getattr(page.Page(**params), mode)()    
+                if mode.startswith("nzo_"):
+                    getattr(action.NzoAction(**params), mode)()
+                if mode.startswith("nzf_"):
+                    getattr(action.NzfAction(**params), mode)()
+                if mode.startswith("sab_"):
+                    getattr(action.SabAction(**params), mode)()
+            except AttributeError:
+                utils.notification("Page missing")
