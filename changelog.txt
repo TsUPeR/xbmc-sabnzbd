@@ -1,2 +1,5 @@
+[B]SABnzbd 3.0.1[/B]
+- Import settings from Pneumatic on first start.
+
 [B]SABnzbd 3.0.0[/B]
 - First commit for Frodo
