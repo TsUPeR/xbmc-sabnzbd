@@ -1,3 +1,6 @@
+[B]SABnzbd 3.0.2[/B]
+- Typo stopping propper settings import from Pneumatic
+
 [B]SABnzbd 3.0.1[/B]
 - Import settings from Pneumatic on first start.
 
