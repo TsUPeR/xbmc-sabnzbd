@@ -63,10 +63,10 @@ def get_parameters(parameterString):
 def import_settings(settings):
     # Try import settings from Pneumatic
     try:
-        pneumatic_settings__ = xbmcaddon.Addon(id='plugin.program.pneumatic')
-        settings.setSetting("sabnzbd_ip", penumatic_settings.getSetting("sabnzbd_ip"))
-        settings.setSetting("sabnzbd_port", penumatic_settings.getSetting("sabnzbd_port"))
-        settings.setSetting("sabnzbd_key", penumatic_settings.getSetting("sabnzbd_key"))
+        pneumatic_settings = xbmcaddon.Addon(id='plugin.program.pneumatic')
+        settings.setSetting("sabnzbd_ip", pneumatic_settings.getSetting("sabnzbd_ip"))
+        settings.setSetting("sabnzbd_port", pneumatic_settings.getSetting("sabnzbd_port"))
+        settings.setSetting("sabnzbd_key", pneumatic_settings.getSetting("sabnzbd_key"))
     except:
         log("import_settings: failed importing settings from Pneumatic")
 
