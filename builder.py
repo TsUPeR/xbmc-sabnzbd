@@ -67,6 +67,12 @@ class CmBuilder:
         cm_path = "%s?%s" % (BASE, path)
         self.list.append([title , "XBMC.RunPlugin(%s)" % (cm_path)])
 
+    def insert_cu(self, pos, title, path):
+        self.list.insert(pos, self._cu(title, path))
+
+    def _cu(self, title, path):
+        return [title , "XBMC.Container.Update(%s?%s)" % (BASE, path)]
+
     def add_list(self, list):
         for title, path in list:
             self.add(title, path)

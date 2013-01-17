@@ -58,7 +58,7 @@ class Page:
         # List nzo
         for nzo in queue.nzo_list:
             title = "%s %s%% %s - %s" % (nzo.status, nzo.percentage, nzo.size, nzo.filename)
-            path = "&mode=page_nzo_details&nzo_id=%s" % nzo.nzo_id
+            path = "&mode=page_queue_details&nzo_id=%s" % nzo.nzo_id
             size = int(round(float(nzo.mb) * 1024))
             page.add(info_labels={'title':title,'size': size,}, \
                      path=path, \
@@ -100,8 +100,7 @@ class Page:
             pause_resume = ("Resume", "&mode=sab_resume_queue&nzo_id=%s" % nzo.nzo_id)
         else:
             pause_resume = ("Pause", "&mode=sab_pause_queue&nzo_id=%s" % nzo.nzo_id)
-        cm_nzo_details = [("Details", "&mode=page_queue_details&nzo_id=%s" % nzo.nzo_id),
-                          pause_resume,
+        cm_nzo_details = [pause_resume,
                           ("Move up", "&mode=nzo_up&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),
                           ("Move down", "&mode=nzo_down&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),
                           ("Category", "&mode=nzo_category&nzo_id=%s" % nzo.nzo_id),
@@ -111,6 +110,7 @@ class Page:
                          # priority
         cm = builder.CmBuilder()
         cm.add_list(cm_nzo_details)
+        cm.insert_cu(0, "Manage files", "&mode=page_nzo_details&nzo_id=%s" % nzo.nzo_id)
         return cm.list
 
     def page_nzo_details(self):
