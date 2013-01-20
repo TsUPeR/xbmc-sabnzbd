@@ -58,7 +58,7 @@ class Page:
         # List nzo
         for nzo in queue.nzo_list:
             title = "%s %s%% %s - %s" % (nzo.status, nzo.percentage, nzo.size, nzo.filename)
-            path = "&mode=page_queue_details&nzo_id=%s" % nzo.nzo_id
+            path = "&mode=dialog_queue_details&nzo_id=%s" % nzo.nzo_id
             size = int(round(float(nzo.mb) * 1024))
             page.add(info_labels={'title':title,'size': size,}, \
                      path=path, \
@@ -143,16 +143,6 @@ class Page:
     def page_nzf_details(self):
         utils.container_refresh()
 
-    def page_queue_details(self):
-        queue = sabnzbd.Queue(SABNZBD)
-        nzo = queue.nzo(self.nzo_id)
-        dialog = xbmcgui.Dialog()
-        heading = nzo.filename
-        line1 = "Status: %s - Completed: %s%% - Size: %s" % (nzo.status, nzo.percentage,  nzo.size)
-        line2 = "Category: %s - Priority: %s - Time left: %s" % (nzo.cat, nzo.priority, nzo.timeleft)
-        line3 = "Age: %s - Eta: %s" % (nzo.avg_age, nzo.eta)
-        ret = dialog.ok(heading, line1, line2, line3)
-
     def page_history(self):
         page = builder.PageBuilder()
         queue = sabnzbd.History(SABNZBD, int(self.start), int(self.limit))
@@ -161,7 +151,7 @@ class Page:
                 title = "* Failed - %s" % (nzo.name)
             else:
                 title = "%s" % (nzo.name)
-            path = "&mode=page_history_details&nzo_id=%s&start=%s&limit=%s" % (nzo.nzo_id, self.start, self.limit)
+            path = "&mode=dialog_history_details&nzo_id=%s&start=%s&limit=%s" % (nzo.nzo_id, self.start, self.limit)
             page.add(info_labels={'title':title, \
                                   'size': nzo.bytes, \
                                   'date': time.strftime('%d.%m.%Y', time.localtime(nzo.completed))}, \
@@ -187,25 +177,6 @@ class Page:
         cm = builder.CmBuilder()
         cm.add_list(cm_history_details)
         return cm.list
-
-    def page_history_details(self):
-        history = sabnzbd.History(SABNZBD, int(self.start), int(self.limit))
-        nzo = history.nzo(self.nzo_id)
-        dialog = xbmcgui.Dialog()
-        heading = nzo.name
-        line1 = "%s: %s - %s" % (nzo.status, time.ctime(nzo.completed), nzo.size)
-        if nzo.fail_message != "":
-            line2 = "%s" % nzo.fail_message
-            line3 = ""
-        else:
-            line2 = "Category: %s - Post Process: %s" % (nzo.category, nzo.pp)
-            line3 = "%s" % nzo.stage_log[0]['actions'][0].replace(' minutes ', 'm').\
-                                                          replace(' minute ', 'm').\
-                                                          replace(' hours ', 'h').\
-                                                          replace(' hour ', 'h').\
-                                                          replace(' seconds', 's').\
-                                                          replace(' second', 's')
-        ret = dialog.ok(heading, line1, line2, line3)
 
     def page_warnings(self):
         page = builder.PageBuilder()
@@ -233,3 +204,37 @@ class Page:
         if mb > 0.00:
             quote = int(round(100*(mb-mbleft)/mb))
         return str(quote)
+
+class Dialog:
+    def __init__ (self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def dialog_queue_details(self):
+        queue = sabnzbd.Queue(SABNZBD)
+        nzo = queue.nzo(self.nzo_id)
+        dialog = xbmcgui.Dialog()
+        heading = nzo.filename
+        line1 = "Status: %s - Completed: %s%% - Size: %s" % (nzo.status, nzo.percentage,  nzo.size)
+        line2 = "Category: %s - Priority: %s - Time left: %s" % (nzo.cat, nzo.priority, nzo.timeleft)
+        line3 = "Age: %s - Eta: %s" % (nzo.avg_age, nzo.eta)
+        ret = dialog.ok(heading, line1, line2, line3)
+
+    def dialog_history_details(self):
+        history = sabnzbd.History(SABNZBD, int(self.start), int(self.limit))
+        nzo = history.nzo(self.nzo_id)
+        dialog = xbmcgui.Dialog()
+        heading = nzo.name
+        line1 = "%s: %s - %s" % (nzo.status, time.ctime(nzo.completed), nzo.size)
+        if nzo.fail_message != "":
+            line2 = "%s" % nzo.fail_message
+            line3 = ""
+        else:
+            line2 = "Category: %s - Post Process: %s" % (nzo.category, nzo.pp)
+            line3 = "%s" % nzo.stage_log[0]['actions'][0].replace(' minutes ', 'm').\
+                                                          replace(' minute ', 'm').\
+                                                          replace(' hours ', 'h').\
+                                                          replace(' hour ', 'h').\
+                                                          replace(' seconds', 's').\
+                                                          replace(' second', 's')
+        ret = dialog.ok(heading, line1, line2, line3)

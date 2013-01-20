@@ -50,7 +50,9 @@ if (__name__ == "__main__" ):
             mode = get("mode")
             try:
                 if mode.startswith("page_"):
-                    getattr(page.Page(**params), mode)()    
+                    getattr(page.Page(**params), mode)()
+                if mode.startswith("dialog_"):
+                    getattr(page.Dialog(**params), mode)()
                 if mode.startswith("nzo_"):
                     getattr(action.NzoAction(**params), mode)()
                 if mode.startswith("nzf_"):
