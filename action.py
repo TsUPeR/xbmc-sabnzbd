@@ -33,6 +33,7 @@ SABNZBD = sabnzbd.Sabnzbd().init_api
 
 class NzoAction:
     def __init__ (self, **kwargs):
+        utils.log("NzoAction: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -92,23 +93,18 @@ class NzfAction:
             setattr(self, key, value)
 
     def nzf_delete(self):
-        utils.log("NzfAction: nzf_delete:")
         self._file_list_position(-1)
 
     def nzf_top(self):
-        utils.log("NzfAction: nzf_top:")
         self._file_list_position(0)
 
     def nzf_up(self):
-        utils.log("NzfAction: nzf_up:")
         self._file_list_position(1)
 
     def nzf_down(self):
-        utils.log("NzfAction: nzf_down:")
         self._file_list_position(2)
 
     def nzf_bottom(self):
-        utils.log("NzfAction: nzf_bottom:")
         self._file_list_position(3)
 
     def _file_list_position(self, pos):
@@ -117,6 +113,7 @@ class NzfAction:
 
 class SabAction:
     def __init__ (self, **kwargs):
+        utils.log("SabAction: kwargs: %s" % kwargs)
         self.sab_kwargs = dict()
         for key, value in kwargs.items():
             if key.startswith('sab_'):

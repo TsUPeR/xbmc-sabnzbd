@@ -36,6 +36,7 @@ SABNZBD = sabnzbd.Sabnzbd().init_api
 
 class Page:
     def __init__ (self, **kwargs):
+        utils.log("Page: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -207,6 +208,7 @@ class Page:
 
 class Dialog:
     def __init__ (self, **kwargs):
+        utils.log("Dialog: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 

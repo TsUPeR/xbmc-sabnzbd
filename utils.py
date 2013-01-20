@@ -67,6 +67,7 @@ def import_settings(settings):
         settings.setSetting("sabnzbd_ip", pneumatic_settings.getSetting("sabnzbd_ip"))
         settings.setSetting("sabnzbd_port", pneumatic_settings.getSetting("sabnzbd_port"))
         settings.setSetting("sabnzbd_key", pneumatic_settings.getSetting("sabnzbd_key"))
+        log("import_settings: imported settings from Pneumatic")
     except:
         log("import_settings: failed importing settings from Pneumatic")
 
