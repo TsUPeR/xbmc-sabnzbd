@@ -101,9 +101,8 @@ class SabnzbdApi:
         return responseMessage
 
     def pause(self):
-        url = "%s&mode=pause" % self.baseurl
-        responseMessage = self._sabResponse(url)
-        return responseMessage
+        self.kwargs['mode'] = 'pause'
+        return self.action()
 
     def pause_queue(self, **kwargs):
         nzbname = kwargs.get('nzbname', None)
