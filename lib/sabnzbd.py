@@ -110,15 +110,15 @@ class SabnzbdApi:
         self.kwargs['value'] = nzo_id
         return self.action()
 
-    def resume(self, nzbname='', id=''):
-        url = self.baseurl + "&mode=resume"
-        if nzbname:
-            sab_nzo_id = self.nzo_id(nzbname)
-            url = self.baseurl + "&mode=queue&name=resume&value=" + str(sab_nzo_id)
-        if id:
-            url = self.baseurl + "&mode=queue&name=resume&value=" + str(id)
-        responseMessage = self._sabResponse(url)
-        return responseMessage
+    def resume(self):
+        self.kwargs['mode'] = 'resume'
+        return self.action()
+
+    def nzo_resume(self, nzo_id):
+        self.kwargs['mode'] = 'queue'
+        self.kwargs['name'] = 'resume'
+        self.kwargs['value'] = nzo_id
+        return self.action()
 
     def delete_queue(self, nzbname='', id=''):
         if nzbname:

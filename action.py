@@ -42,6 +42,11 @@ class NzoAction:
         utils.container_refresh()
         utils.notification("Jobb paused: %s" % message)
 
+    def nzo_resume(self):
+        message = SABNZBD.nzo_resume(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Jobb resumed: %s" % message)
+
     def nzo_up(self):
         self._switch(-1)
 
@@ -162,12 +167,6 @@ class SabAction:
         message = SABNZBD.resume()
         utils.container_refresh()
         utils.notification("Queue resumed: %s" % message)
-
-    def sab_resume_queue(self):
-        # nzo_resume
-        message = SABNZBD.resume(id=self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Jobb resumed: %s" % message)
 
     def sab_queue_delete_files(self):
         # nzo_queue_delete_files

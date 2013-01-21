@@ -98,7 +98,7 @@ class Page:
 
     def _cm_nzo(self, nzo):
         if nzo.status.lower() == "paused":
-            pause_resume = ("Resume", "&mode=sab_resume_queue&nzo_id=%s" % nzo.nzo_id)
+            pause_resume = ("Resume", "&mode=nzo_resume&nzo_id=%s" % nzo.nzo_id)
         else:
             pause_resume = ("Pause", "&mode=nzo_pause&nzo_id=%s" % nzo.nzo_id)
         cm_nzo_details = [pause_resume,
