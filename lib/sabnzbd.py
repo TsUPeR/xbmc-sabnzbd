@@ -100,6 +100,15 @@ class SabnzbdApi:
         responseMessage = post_form.post(path, self.apikey, url, **kwargs)
         return responseMessage
 
+    def max_speed(self, speed):
+        self.kwargs['mode'] = 'config'
+        self.kwargs['name'] = 'speedlimit'
+        self.kwargs['value'] = speed
+        return self.action()
+
+    def reset_speed(self):
+        return self.max_speed('')
+
     def pause(self):
         self.kwargs['mode'] = 'pause'
         return self.action()

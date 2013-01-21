@@ -145,17 +145,11 @@ class SabAction:
         dialog = xbmcgui.Dialog()
         ret = dialog.numeric(0, 'SABnzbd Max speed  in KB/s')
         if ret is not "":
-            self.sab_kwargs['mode'] = 'config'
-            self.sab_kwargs['name'] = 'speedlimit'
-            self.sab_kwargs['value'] = int(ret)
-            message = self.sab_action()
+            message = SABNZBD.max_speed(int(ret))
             utils.container_refresh()
 
     def sab_reset_speed(self):
-        self.sab_kwargs['mode'] = 'config'
-        self.sab_kwargs['name'] = 'speedlimit'
-        self.sab_kwargs['value'] = ''
-        message = self.sab_action()
+        message = SABNZBD.reset_speed()
         utils.container_refresh()
 
     def sab_pause(self):
