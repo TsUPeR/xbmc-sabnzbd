@@ -104,18 +104,11 @@ class SabnzbdApi:
         self.kwargs['mode'] = 'pause'
         return self.action()
 
-    def pause_queue(self, **kwargs):
-        nzbname = kwargs.get('nzbname', None)
-        id = kwargs.get('id', None)
-        url = "%s&mode=queue&name=pause" % (self.baseurl)
-        if nzbname is not None and id is None:
-            id = self.nzo_id(nzbname)
-        if id is not None:
-            url = "%s&value=%s" % (url, str(id))
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for pause_queue provided"
-        return responseMessage
+    def nzo_pause(self, nzo_id):
+        self.kwargs['mode'] = 'queue'
+        self.kwargs['name'] = 'pause'
+        self.kwargs['value'] = nzo_id
+        return self.action()
 
     def resume(self, nzbname='', id=''):
         url = self.baseurl + "&mode=resume"

@@ -100,7 +100,7 @@ class Page:
         if nzo.status.lower() == "paused":
             pause_resume = ("Resume", "&mode=sab_resume_queue&nzo_id=%s" % nzo.nzo_id)
         else:
-            pause_resume = ("Pause", "&mode=sab_pause_queue&nzo_id=%s" % nzo.nzo_id)
+            pause_resume = ("Pause", "&mode=nzo_pause&nzo_id=%s" % nzo.nzo_id)
         cm_nzo_details = [pause_resume,
                           ("Move up", "&mode=nzo_up&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),
                           ("Move down", "&mode=nzo_down&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),

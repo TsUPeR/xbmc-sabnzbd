@@ -37,6 +37,11 @@ class NzoAction:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+    def nzo_pause(self):
+        message = SABNZBD.nzo_pause(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Jobb paused: %s" % message)
+
     def nzo_up(self):
         self._switch(-1)
 
@@ -152,12 +157,6 @@ class SabAction:
         message = SABNZBD.pause()
         utils.container_refresh()
         utils.notification("SAB paused: %s" % message)
-
-    def sab_pause_queue(self):
-        # nzo_pause
-        message = SABNZBD.pause_queue(id=self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Jobb paused: %s" % message)
 
     def sab_resume(self):
         message = SABNZBD.resume()
