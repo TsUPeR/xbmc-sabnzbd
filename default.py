@@ -48,16 +48,13 @@ if (__name__ == "__main__" ):
             params = utils.get_parameters(sys.argv[2])
             get = params.get
             mode = get("mode")
-            try:
-                if mode.startswith("page_"):
-                    getattr(page.Page(**params), mode)()
-                if mode.startswith("dialog_"):
-                    getattr(page.Dialog(**params), mode)()
-                if mode.startswith("nzo_"):
-                    getattr(action.NzoAction(**params), mode)()
-                if mode.startswith("nzf_"):
-                    getattr(action.NzfAction(**params), mode)()
-                if mode.startswith("sab_"):
-                    getattr(action.SabAction(**params), mode)()
-            except AttributeError:
-                utils.notification("Page missing")
+            if mode.startswith("page_"):
+                getattr(page.Page(**params), mode)()
+            if mode.startswith("dialog_"):
+                getattr(page.Dialog(**params), mode)()
+            if mode.startswith("nzo_"):
+                getattr(action.NzoAction(**params), mode)()
+            if mode.startswith("nzf_"):
+                getattr(action.NzfAction(**params), mode)()
+            if mode.startswith("sab_"):
+                getattr(action.SabAction(**params), mode)()
