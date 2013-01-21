@@ -150,7 +150,7 @@ class SabAction:
 
     def sab_pause(self):
         message = SABNZBD.pause()
-        containter_refresh()
+        utils.container_refresh()
         utils.notification("SAB paused: %s" % message)
 
     def sab_pause_queue(self):
