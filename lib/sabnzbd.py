@@ -59,9 +59,11 @@ class SabnzbdApi:
             opener = urllib2.build_opener(authhandler)
             urllib2.install_opener(opener)
         self.category = category
+        self.kwargs = dict()
 
     def action(self, **kwargs):
-        url = "%s&%s" % (self.baseurl, urllib.urlencode(kwargs))
+        self.kwargs.update(**kwargs)
+        url = "%s&%s" % (self.baseurl, urllib.urlencode(self.kwargs))
         responseMessage = self._sabResponse(url)
         return responseMessage
 
