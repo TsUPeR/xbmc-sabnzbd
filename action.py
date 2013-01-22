@@ -47,6 +47,16 @@ class NzoAction:
         utils.container_refresh()
         utils.notification("Jobb resumed: %s" % message)
 
+    def nzo_delete(self):
+        message = SABNZBD.nzo_delete(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Delete: %s" % message)
+
+    def nzo_delete_files(self):
+        message = SABNZBD.nzo_delete_files(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Delete: %s" % message)
+
     def nzo_up(self):
         self._switch(-1)
 
@@ -161,16 +171,6 @@ class SabAction:
         message = SABNZBD.resume()
         utils.container_refresh()
         utils.notification("Queue resumed: %s" % message)
-
-    def sab_queue_delete_files(self):
-        # nzo_queue_delete_files
-        self.sab_kwargs['value'] = self.nzo_id
-        self.sab_kwargs['mode'] = 'queue'
-        self.sab_kwargs['name'] = 'delete'
-        self.sab_kwargs['del_files'] = '1'
-        message = self.sab_action()
-        utils.container_refresh()
-        utils.notification("Delete: %s" % message)
 
     def sab_history_delete(self):
         if 'value' not in self.sab_kwargs:

@@ -106,7 +106,7 @@ class Page:
                           ("Move down", "&mode=nzo_down&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),
                           ("Category", "&mode=nzo_category&nzo_id=%s" % nzo.nzo_id),
                           ("Post process", "&mode=nzo_pp&nzo_id=%s" % nzo.nzo_id),
-                          ("Delete", "&mode=sab_queue_delete_files&nzo_id=%s" % nzo.nzo_id)
+                          ("Delete", "&mode=nzo_delete_files&nzo_id=%s" % nzo.nzo_id)
                          ]
                          # priority
         cm = builder.CmBuilder()

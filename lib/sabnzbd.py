@@ -129,17 +129,19 @@ class SabnzbdApi:
         self.kwargs['value'] = nzo_id
         return self.action()
 
-    def delete_queue(self, nzbname='', id=''):
-        if nzbname:
-            sab_nzo_id = self.nzo_id(nzbname)
-            url = self.baseurl + "&mode=queue&name=delete&del_files=1&value=" + str(sab_nzo_id)
-            responseMessage = self._sabResponse(url)
-        elif id:
-            url = self.baseurl + "&mode=queue&name=delete&del_files=1&value=" + str(id)
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for delete queue provided"
-        return responseMessage
+    def nzo_delete(self, nzo_id):
+        # will leave data in the incomplete dir
+        self.kwargs['mode'] = 'queue'
+        self.kwargs['name'] = 'delete'
+        self.kwargs['value'] = nzo_id
+        return self.action()
+
+    def nzo_delete_files(self, nzo_id):
+        self.kwargs['mode'] = 'queue'
+        self.kwargs['name'] = 'delete'
+        self.kwargs['value'] = nzo_id
+        self.kwargs['del_files'] = '1'
+        return self.action()
 
     def delete_history(self, nzbname='', id=''):
         if nzbname:
