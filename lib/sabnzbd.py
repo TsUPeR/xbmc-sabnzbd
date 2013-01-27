@@ -170,19 +170,11 @@ class SabnzbdApi:
         self.kwargs['failed_only'] = '1'
         return self.action() 
 
-    def postProcess(self, value=0, nzbname='',id=''):
-        if not value in range(0,3):
-            value = 0
-        if nzbname:
-            sab_nzo_id = self.nzo_id(nzbname)
-            url = self.baseurl + "&mode=change_opts&value=" + str(sab_nzo_id) + "&value2=" + str(value)
-            responseMessage = self._sabResponse(url)
-        elif id:
-            url = self.baseurl + "&mode=change_opts&value=" + str(id) + "&value2=" + str(value)
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for post process provided"
-        return responseMessage
+    def nzo_pp(self, nzo_id, value=0):
+        self.kwargs['mode'] = 'change_opts'
+        self.kwargs['value'] = nzo_id
+        self.kwargs['value2'] = value
+        return self.action()
 
     def switch(self, value=0, nzbname='',id=''):
         if not value in range(0,100):
@@ -216,7 +208,7 @@ class SabnzbdApi:
         if (not id) and nzbname:
             id = self.nzo_id(nzbname)
         if id:
-            ppMessage = self.postProcess(0,'',id)
+            ppMessage = self.nzo_pp(id,0)
             switchMessage = self.switch(0,'',id)
             if "ok" in (ppMessage and switchMessage):
                 responseMessage = "ok"

@@ -104,16 +104,11 @@ class NzoAction:
         dialog = xbmcgui.Dialog()
         pp_list = ['Download', '+Repair', '+Unpack', '+Delete']
         ret = dialog.select('SABnzbd Post process', pp_list)
-        print ret
+        utils.log("nzo_pp: pp: %s" % ret)
         if ret == -1:
             return
         else:
-            utils.log("nzo_pp: pp: %s" % ret)
-            sab = SabAction()
-            sab.sab_kwargs['mode'] = 'change_opts'
-            sab.sab_kwargs['value'] = self.nzo_id
-            sab.sab_kwargs['value2'] = ret
-            sab.sab_action()
+            message = SABNZBD.nzo_pp(self.nzo_id, ret)
             utils.container_refresh()
 
 class NzfAction:
