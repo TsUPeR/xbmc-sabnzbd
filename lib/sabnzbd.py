@@ -143,18 +143,32 @@ class SabnzbdApi:
         self.kwargs['del_files'] = '1'
         return self.action()
 
-    def delete_history(self, nzbname='', id=''):
-        if nzbname:
-            sab_nzo_id = self.nzo_id_history(nzbname)
-            # TODO if nothing found
-            url = self.baseurl + "&mode=history&name=delete&del_files=1&value=" + str(sab_nzo_id)
-            responseMessage = self._sabResponse(url)
-        elif id:
-            url = self.baseurl + "&mode=history&name=delete&del_files=1&value=" + str(id)
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for delete history provided"
-        return responseMessage 
+    def nzo_delete_history(self, nzo_id):
+        self.kwargs['mode'] = 'history'
+        self.kwargs['name'] = 'delete'
+        self.kwargs['value'] = nzo_id
+        return self.action()
+
+    def nzo_delete_history_files(self, nzo_id):
+        self.kwargs['mode'] = 'history'
+        self.kwargs['name'] = 'delete'
+        self.kwargs['value'] = nzo_id
+        self.kwargs['del_files'] = '1'
+        return self.action()
+
+    def delete_history_all(self):
+        self.kwargs['mode'] = 'history'
+        self.kwargs['name'] = 'delete'
+        self.kwargs['value'] = 'all'
+        return self.action()
+
+    def delete_history_files_all(self):
+        self.kwargs['mode'] = 'history'
+        self.kwargs['name'] = 'delete'
+        self.kwargs['value'] = 'all'
+        self.kwargs['del_files'] = '1'
+        self.kwargs['failed_only'] = '1'
+        return self.action() 
 
     def postProcess(self, value=0, nzbname='',id=''):
         if not value in range(0,3):

@@ -57,6 +57,16 @@ class NzoAction:
         utils.container_refresh()
         utils.notification("Delete: %s" % message)
 
+    def nzo_delete_history(self):
+        message = SABNZBD.nzo_delete_history(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Remove: %s" % message)
+
+    def nzo_delete_history_files(self):
+        message = SABNZBD.nzo_delete_history_files(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Remove: %s" % message)
+
     def nzo_up(self):
         self._switch(-1)
 
@@ -172,35 +182,21 @@ class SabAction:
         utils.container_refresh()
         utils.notification("Queue resumed: %s" % message)
 
-    def sab_history_delete(self):
-        if 'value' not in self.sab_kwargs:
-            self.sab_kwargs['value'] = self.nzo_id
-        self.sab_kwargs['mode'] = 'history'
-        self.sab_kwargs['name'] = 'delete'
-        message = self.sab_action()
-        utils.container_refresh()
-        utils.notification("Remove: %s" % message)
-
-    def sab_history_delete_all(self):
+    def sab_delete_history_all(self):
         dialog = xbmcgui.Dialog()
         ret = dialog.yesno('SABnzbd History', 'Remove whole history', 'Are you sure?')
         if ret:
-            self.sab_kwargs['value'] = 'all'
-            self.sab_history_delete()
+            message = SABNZBD.nzo_delete_history_all(self.nzo_id)
+            utils.container_refresh()
+            utils.notification("Remove: %s" % message)
 
-    def sab_history_delete_files(self):
-        self.sab_kwargs['del_files'] = '1'
-        self.sab_kwargs['failed_only'] = '1'
-        self.sab_history_delete()
-
-    def sab_history_delete_files_all(self):
+    def sab_delete_history_files_all(self):
         dialog = xbmcgui.Dialog()
         ret = dialog.yesno('SABnzbd History', 'Remove all failed + delete files', 'Are you sure?')
         if ret:
-            self.sab_kwargs['value'] = 'all'
-            self.sab_kwargs['del_files'] = '1'
-            self.sab_kwargs['failed_only'] = '1'
-            self.sab_history_delete()
+            message = SABNZBD.nzo_delete_history_files_all(self.nzo_id)
+            utils.container_refresh()
+            utils.notification("Remove: %s" % message)
 
     def sab_retry(self):
         # TODO

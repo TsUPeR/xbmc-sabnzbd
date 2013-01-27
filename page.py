@@ -168,13 +168,13 @@ class Page:
         page.show()
 
     def _cm_history(self, nzo):
-        cm_history_details = [("Remove", "&mode=sab_history_delete&nzo_id=%s" % nzo.nzo_id)]
+        cm_history_details = [("Remove", "&mode=nzo_delete_history&nzo_id=%s" % nzo.nzo_id)]
         if nzo.status.lower() == "failed":
             cm_history_details.insert(0, ("Retry", "&mode=sab_retry&nzo_id=%s" % nzo.nzo_id))
-            cm_history_details.append(("Remove + delete", "&mode=sab_history_delete_files&nzo_id=%s" % nzo.nzo_id))
-            cm_history_details.append(("Remove all failed + delete files", "&mode=sab_history_delete_files_all"))
+            cm_history_details.append(("Remove + delete", "&mode=nzo_delete_history_files&nzo_id=%s" % nzo.nzo_id))
+            cm_history_details.append(("Remove all failed + delete files", "&mode=sab_delete_history_files_all"))
         else:
-            cm_history_details.append(("Remove all", "&mode=sab_history_delete_all"))
+            cm_history_details.append(("Remove all", "&mode=sab_delete_history_all"))
         cm = builder.CmBuilder()
         cm.add_list(cm_history_details)
         return cm.list
