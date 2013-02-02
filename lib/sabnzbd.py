@@ -176,6 +176,12 @@ class SabnzbdApi:
         self.kwargs['value2'] = value
         return self.action()
 
+    def nzo_category(self, nzo_id, category='*'):
+        self.kwargs['mode'] = 'change_cat'
+        self.kwargs['value'] = nzo_id
+        self.kwargs['value2'] = category
+        return self.action()
+        
     def switch(self, value=0, nzbname='',id=''):
         if not value in range(0,100):
             value = 0
@@ -216,25 +222,6 @@ class SabnzbdApi:
                 responseMessage = "failed setStreaming"
         else:
             responseMessage = "no name or id for setStreaming provided"
-        return responseMessage
-
-    def set_category(self, **kwargs):
-        category = kwargs.get('category', None)
-        nzbname = kwargs.get('nzbname', None)
-        id = kwargs.get('id', None)
-        url = "%s&mode=change_cat" % (self.baseurl)
-        if category is None:
-            if self.category is None or self.category == '':
-                category = '*'
-            else:
-                category = self.category
-        if nzbname is not None:
-            id = self.nzo_id(nzbname)
-        if id is not None:
-            url = "%s&value=%s&value2=%s" % (url, str(id), str(category))
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for setCategory provided"
         return responseMessage
 
     def _sabResponse(self, url):
@@ -388,17 +375,6 @@ class SabnzbdApi:
             return None
         response.close()
         return
-
-    def category_list(self):
-        url = self.baseurl + "&mode=get_config&section=categories&output=xml"
-        doc = _load_xml(url)
-        category_list = []
-        if doc:
-            if doc.getElementsByTagName("category"):
-                for category in doc.getElementsByTagName("category"):
-                    category = get_node_value(category, "name")
-                    category_list.append(category)
-        return category_list
 
     def misc_settings_dict(self):
         url = self.baseurl + "&mode=get_config&section=misc&output=xml"

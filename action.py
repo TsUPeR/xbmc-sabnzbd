@@ -83,21 +83,19 @@ class NzoAction:
 
     def nzo_category(self):
         dialog = xbmcgui.Dialog()
-        category_list = SABNZBD.category_list()
+        category_list = sabnzbd.Queue(SABNZBD).categories
         utils.log("nzo_category: category_list: %s" % category_list)
         category_list.remove('*')
         category_list.insert(0, 'Default')
         ret = dialog.select('Select SABnzbd category', category_list)
-        if ret <= 0:
+        category_list.remove('Default')
+        category_list.insert(0, '*')
+        if ret == -1:
             return
         else:
             category = category_list[ret]
             utils.log("nzo_category: category: %s" % category)
-            sab = SabAction()
-            sab.sab_kwargs['mode'] = 'change_cat'
-            sab.sab_kwargs['value'] = self.nzo_id
-            sab.sab_kwargs['value2'] = category
-            sab.sab_action()
+            message = SABNZBD.nzo_category(self.nzo_id, category)
             utils.container_refresh()
 
     def nzo_pp(self):
