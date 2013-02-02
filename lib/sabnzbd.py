@@ -504,13 +504,11 @@ def _load_json(url):
     return out
 
 class Queue:
-    def __init__(self, sabnzbd):
+    def __init__(self, sabnzbd, start=0, limit=50):
         self.sabnzbd = sabnzbd
         self.nzo_list = []
-        self._get_queue()
-
-    def _get_queue(self):
-        url = "%s&mode=queue&start=0&limit=50&output=json" % self.sabnzbd.baseurl
+        url = "%s&mode=queue&start=%s&limit=%s&output=json" % \
+              (self.sabnzbd.baseurl, start, limit)
         doc = _load_json(url)
         if doc:
             for key, value in doc["queue"].items():
