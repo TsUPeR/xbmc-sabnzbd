@@ -74,11 +74,7 @@ class NzoAction:
         self._switch(1)
 
     def _switch(self, value):
-        sab = SabAction()
-        sab.sab_kwargs['mode'] = 'switch'
-        sab.sab_kwargs['value'] = self.nzo_id
-        sab.sab_kwargs['value2'] = int(self.index) + value
-        sab.sab_action()
+        message = SABNZBD.nzo_switch(self.nzo_id, (int(self.index) + value))
         utils.container_refresh()
 
     def nzo_category(self):

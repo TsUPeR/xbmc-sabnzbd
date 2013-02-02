@@ -181,22 +181,12 @@ class SabnzbdApi:
         self.kwargs['value'] = nzo_id
         self.kwargs['value2'] = category
         return self.action()
-        
-    def switch(self, value=0, nzbname='',id=''):
-        if not value in range(0,100):
-            value = 0
-        if nzbname:
-            sab_nzo_id = self.nzo_id(nzbname)
-            url = self.baseurl + "&mode=switch&value=" + str(sab_nzo_id) + "&value2=" + str(value)
-            responseMessage = self._sabResponse(url)
-        elif id:
-            url = self.baseurl + "&mode=switch&value=" + str(id) + "&value2=" + str(value)
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for job switch provided"
-        if "0" or "-1 1" in responseMessage:
-            responseMessage = "ok"
-        return responseMessage
+
+    def nzo_switch(self, nzo_id, value=0):
+        self.kwargs['mode'] = 'switch'
+        self.kwargs['value'] = nzo_id
+        self.kwargs['value2'] = value
+        return self.action()
 
     def repair(self, nzbname='',id=''):
         if nzbname:
