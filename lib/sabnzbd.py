@@ -193,19 +193,14 @@ class SabnzbdApi:
         self.kwargs['value'] = nzo_id
         return self.action()
 
-    def setStreaming(self, nzbname='',id=''):
-        if (not id) and nzbname:
-            id = self.nzo_id(nzbname)
-        if id:
-            ppMessage = self.nzo_pp(id,0)
-            switchMessage = self.switch(0,'',id)
-            if "ok" in (ppMessage and switchMessage):
-                responseMessage = "ok"
-            else:
-                responseMessage = "failed setStreaming"
+    def nzo_set_streaming(self, nzo_id):
+        pp_message = self.nzo_pp(nzo_id,0)
+        switch_message = self.switch(nzo_id, 0)
+        if "ok" in (pp_message and switch_message):
+            message = "ok"
         else:
-            responseMessage = "no name or id for setStreaming provided"
-        return responseMessage
+            message = "failed nzo_set_streaming"
+        return message
 
     def _sabResponse(self, url):
         try:
