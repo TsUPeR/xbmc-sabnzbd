@@ -105,6 +105,20 @@ class NzoAction:
             message = SABNZBD.nzo_pp(self.nzo_id, ret)
             utils.container_refresh()
 
+    def nzo_retry(self):
+        # TODO
+        # dialog = xbmcgui.Dialog()
+        # ret = dialog.yesno('SABnzbd Retry', 'Add optional supplemental NZB?', '# TODO')
+        # if ret:
+            # dialog = xbmcgui.Dialog()
+            # nzb_file = dialog.browse(0, 'Pick a folder', 'files')
+            # # XBMC outputs utf-8
+            # path = unicode(nzb_file, 'utf-8')
+        # else:
+        message = SABNZBD.nzo_retry(self.nzo_id)
+        utils.container_refresh()
+        utils.notification("Retry: %s" % message)
+
 class NzfAction:
     def __init__ (self, **kwargs):
         utils.log("NzfAction: kwargs: %s" % kwargs)
@@ -186,22 +200,6 @@ class SabAction:
             message = SABNZBD.nzo_delete_history_files_all(self.nzo_id)
             utils.container_refresh()
             utils.notification("Remove: %s" % message)
-
-    def sab_retry(self):
-        # TODO
-        # dialog = xbmcgui.Dialog()
-        # ret = dialog.yesno('SABnzbd Retry', 'Add optional supplemental NZB?', '# TODO')
-        # if ret:
-            # dialog = xbmcgui.Dialog()
-            # nzb_file = dialog.browse(0, 'Pick a folder', 'files')
-            # # XBMC outputs utf-8
-            # path = unicode(nzb_file, 'utf-8')
-        # else:
-        self.sab_kwargs['mode'] = 'retry'
-        self.sab_kwargs['value'] = self.nzo_id
-        message = self.sab_action()
-        utils.container_refresh()
-        utils.notification("Retry: %s" % message)
 
     def sab_restart(self):
         self.sab_kwargs['mode'] = 'restart'

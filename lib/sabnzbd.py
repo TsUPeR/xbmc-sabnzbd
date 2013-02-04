@@ -188,18 +188,11 @@ class SabnzbdApi:
         self.kwargs['value2'] = value
         return self.action()
 
-    def repair(self, nzbname='',id=''):
-        if nzbname:
-            sab_nzo_id = self.nzo_id(nzbname)
-            url = self.baseurl + "&mode=retry&value=" + str(sab_nzo_id)
-            responseMessage = self._sabResponse(url)
-        elif id:
-            url = self.baseurl + "&mode=retry&value=" + str(id)
-            responseMessage = self._sabResponse(url)
-        else:
-            responseMessage = "no name or id for repair provided"
-        return responseMessage 
-        
+    def nzo_retry(self, nzo_id):
+        self.kwargs['mode'] = 'retry'
+        self.kwargs['value'] = nzo_id
+        return self.action()
+
     def setStreaming(self, nzbname='',id=''):
         if (not id) and nzbname:
             id = self.nzo_id(nzbname)
