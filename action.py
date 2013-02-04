@@ -189,7 +189,7 @@ class SabAction:
         dialog = xbmcgui.Dialog()
         ret = dialog.yesno('SABnzbd History', 'Remove whole history', 'Are you sure?')
         if ret:
-            message = SABNZBD.nzo_delete_history_all(self.nzo_id)
+            message = SABNZBD.delete_history_all()
             utils.container_refresh()
             utils.notification("Remove: %s" % message)
 
