@@ -27,9 +27,8 @@ def post(path, apikey, url, **kwargs):
     req.add_header('Content-type', form.get_content_type())
     req.add_header('Content-length', len(body))
     req.add_data(body)
-    response = urllib2.urlopen(req)
     # Dont care about the response
-    response.close()
+    utils.load_url(url, req, "SABnzbd failed posting data")
     return "ok"
 
 class MultiPartForm(object):

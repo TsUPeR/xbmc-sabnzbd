@@ -25,6 +25,7 @@
 
 import os
 import urllib
+import urllib2
 import xbmc
 import xbmcgui
 import xbmcaddon
@@ -36,6 +37,7 @@ __icon__ = __settings__.getAddonInfo("icon")
 __userdata__ = xbmc.translatePath(__settings__.getAddonInfo("profile"))
 
 DEBUG_LOG = (__settings__.getSetting("debug_log").lower() == "true")
+UA_HEADER = 'Xbmc/14.0 (Addon; plugin.program.sabnzbd)'
 
 def container_refresh():
     xbmc.sleep(500)
@@ -268,3 +270,32 @@ def unikeyboard(default, message):
         return txt
     else:
         return None
+
+def load_url(url, req=None, notificationMsg=None):
+        log("SABnzbd: load_url: url: %s" % url)
+        if req is None:
+            req = urllib2.Request(url)
+        req.add_header('User-Agent', UA_HEADER)
+        doc = None
+        try:
+            response = urllib2.urlopen(req)
+        except urllib2.URLError, ex:
+            msg = None
+            if hasattr(ex, 'reason'):
+                log("SABnzbd: load_url: reason: %s unable to load url: %s" % \
+                          (ex.reason, url))
+                msg = ex.reason
+            elif hasattr(ex, 'code'):
+                log("SABnzbd: _load_url: reason: %s unable to load url: %s" % \
+                          (ex.code, url))
+                msg = ex.code
+            if msg is None:
+                msg = "SABnzbd unknown communication error"
+            notification("%s %s" % (msg, url))
+            if notificationMsg is not None:
+                notification(notificationMsg)
+        else:
+            doc = response.read()
+        finally:
+            response.close()
+            return doc

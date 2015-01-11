@@ -203,20 +203,9 @@ class SabnzbdApi:
         return message
 
     def _sabResponse(self, url):
-        try:
-            req = urllib2.Request(url)
-            response = urllib2.urlopen(req)
-        except:
-            responseMessage = "unable to load url: " + url
-        else:
-            log_msg = response.read()
-            response.close()
-            if "ok" in log_msg:
-                responseMessage = 'ok'
-            else:
-                responseMessage = log_msg
-            utils.log("SABnzbd: _sabResponse message: %s" % log_msg)
-            utils.log("SABnzbd: _sabResponse from url: %s" % url)
+        responseMessage = _load_url(url)
+        utils.log("SABnzbd: _sabResponse message: %s" % responseMessage)
+        utils.log("SABnzbd: _sabResponse from url: %s" % url)
         return responseMessage
 
     def nzo_id(self, nzbname, nzb = None):
@@ -344,14 +333,7 @@ class SabnzbdApi:
               + self.apikey + "&action_key=" + action[position]
         for nzf_id in sab_nzf_id:
             url = url + "&" + nzf_id + "=on"
-        try:
-            req = urllib2.Request(url)
-            response = urllib2.urlopen(req)
-        except:
-            utils.log("SABnzbd: file_list_position: unable to load url: %s" % url)
-            utils.notification("SABnzbd failed moving file to top of queue")
-            return None
-        response.close()
+        utils.load_url(url, None, "SABnzbd failed moving file to top of queue")
         return
 
     def misc_settings_dict(self):
@@ -372,14 +354,9 @@ class SabnzbdApi:
         # 2. check allow_streaming
         # 3. set allow streaming if missing
         url = self.baseurl + "&mode=version&output=xml"
-        try:
-            req = urllib2.Request(url)
-            response = urllib2.urlopen(req)
-        except:
+        if _load_url(url) is None:
             utils.log("SABnzbd: setup_streaming: unable to conncet to SABnzbd: %s" % url)
             return "ip"
-        xml = response.read()
-        response.close()
         url = self.baseurl + "&mode=get_config&section=misc&keyword=allow_streaming&output=xml"
         doc = _load_xml(url)
         if doc.getElementsByTagName("result"):
@@ -400,38 +377,13 @@ def get_node_value(parent, name, ns=""):
         return unicode(parent.getElementsByTagName(name)[0].childNodes[0].data.encode('utf-8'), 'utf-8')
 
 def _load_url(url):
-        utils.log("SABnzbd: _load_url: url: %s" % url)
-        headers = { 'User-Agent' : 'Xbmc/12.0 (Addon; plugin.program.sabnzbd)' }
-        req = urllib2.Request(url, None, headers)
-        try:
-            response = urllib2.urlopen(req)
-        except urllib2.URLError, ex:
-            if hasattr(ex, 'reason'):
-                utils.log("SABnzbd: _load_url: reason: %s unable to load url: %s" % \
-                          (ex.reason, url))
-                return None
-            elif hasattr(ex, 'code'):
-                utils.log("SABnzbd: _load_url: reason: %s unable to load url: %s" % \
-                          (ex.code, url))
-                return None
-        else:
-            doc = response.read()
-            response.close()
-            return doc
+        utils.log("SABnzbd: _load_url: ")
+        return utils.load_url(url)
 
 def _load_xml(url):
-    utils.log("SABnzbd: _load_xml: url: %s" % url)
+    utils.log("SABnzbd: _load_xml: ")
     try:
-        req = urllib2.Request(url)
-        response = urllib2.urlopen(req)
-    except:
-        utils.log("SABnzbd: _load_xml: unable to load url: %s" % url)
-        utils.notification("SABnzbd down")
-        return None
-    xml = response.read()
-    response.close()
-    try:
-        out = parseString(xml)
+        out = parseString(_load_url(url))
     except:
         utils.log("SABnzbd: _load_xml: malformed xml from url: %s" % url)
         utils.notification("SABnzbd malformed xml")
@@ -441,16 +393,7 @@ def _load_xml(url):
 def _load_json(url):
     utils.log("SABnzbd: _load_json: url: %s" % url)
     try:
-        req = urllib2.Request(url)
-        response = urllib2.urlopen(req)
-    except:
-        utils.log("SABnzbd: _load_json: unable to load url: %s" % url)
-        utils.notification("SABnzbd down")
-        return None
-    resp = response.read()
-    response.close()
-    try:
-     out = json.loads(resp)
+        out = json.loads(_load_url(url))
     except:
         utils.log("SABnzbd: _load_json: malformed json from url: %s" % url)
         utils.notification("SABnzbd malformed json")
