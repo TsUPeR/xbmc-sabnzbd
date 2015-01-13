@@ -27,7 +27,6 @@ import os
 import urllib
 import urllib2
 import xbmc
-import xbmcgui
 import xbmcaddon
 import xbmcvfs
 import stat
