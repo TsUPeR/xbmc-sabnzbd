@@ -23,11 +23,10 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import xbmc
 import xbmcgui
 
 import utils
-import sabnzbd
+import resources.lib.sabnzbd as sabnzbd
 
 SABNZBD = sabnzbd.Sabnzbd().init_api
 

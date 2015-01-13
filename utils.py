@@ -30,8 +30,8 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 import stat
+from resources.lib.sabnzbd import Sabnzbd
 
-from sabnzbd import Sabnzbd
 
 __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
 __icon__ = __settings__.getAddonInfo("icon")

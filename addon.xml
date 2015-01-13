@@ -10,7 +10,7 @@
             library="default.py">
         <provides>executable</provides>
   </extension>
-  <extension point="xbmc.python.module" library="lib" />
+  <extension point="xbmc.python.module" library="resources/lib" />
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <summary>SABnzbd</summary>

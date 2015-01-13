@@ -25,14 +25,13 @@
 
 import urllib
 import urllib2
-import xbmc
 import xbmcaddon
-from xml.dom.minidom import parse, parseString
+from xml.dom.minidom import parseString
 #
 try: import simplejson as json
 except ImportError: import json
 #
-import post_form
+from resources.lib import post_form
 
 import utils
 
