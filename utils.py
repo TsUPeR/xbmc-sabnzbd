@@ -271,6 +271,6 @@ def load_url(url, req=None, notificationMsg=None):
                 notification(notificationMsg)
         else:
             doc = response.read()
-        finally:
             response.close()
-            return doc
+        return doc
+
