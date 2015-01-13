@@ -37,10 +37,9 @@ if (__name__ == "__main__" ):
     utils.log('v%s started' % __settings__.getAddonInfo("version"), xbmc.LOGNOTICE)
     HANDLE = int(sys.argv[1])
     if not (__settings__.getSetting("firstrun")):
-        utils.import_settings(__settings__)
         __settings__.openSettings()
-        # if utils.pass_setup_test(SABNZBD.setup_streaming(), __settings__.getSetting("sabnzbd_incomplete")):
-        __settings__.setSetting("firstrun", '1')
+        if utils.pass_setup_test():
+            __settings__.setSetting("firstrun", '1')
     else:
         if (not sys.argv[2]):
             page.Page().page_main()

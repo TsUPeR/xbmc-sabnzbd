@@ -32,6 +32,8 @@ import xbmcaddon
 import xbmcvfs
 import stat
 
+from sabnzbd import Sabnzbd
+
 __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
 __icon__ = __settings__.getAddonInfo("icon")
 __userdata__ = xbmc.translatePath(__settings__.getAddonInfo("profile"))
@@ -62,45 +64,18 @@ def get_parameters(parameterString):
     log("get_parameters: commands: %s" % commands)
     return commands
 
-def import_settings(settings):
-    # Try import settings from Pneumatic
-    try:
-        pneumatic_settings = xbmcaddon.Addon(id='plugin.program.pneumatic')
-        settings.setSetting("sabnzbd_ip", pneumatic_settings.getSetting("sabnzbd_ip"))
-        settings.setSetting("sabnzbd_port", pneumatic_settings.getSetting("sabnzbd_port"))
-        settings.setSetting("sabnzbd_key", pneumatic_settings.getSetting("sabnzbd_key"))
-        log("import_settings: imported settings from Pneumatic")
-    except:
-        log("import_settings: failed importing settings from Pneumatic")
-
-def pass_setup_test(result, incomplete):
-    log("pass_setup_test: result: %s incomplete: %s" % (result, incomplete))
+def pass_setup_test():
+    log("pass_setup_test:")
+    result = Sabnzbd().init_api.self_test()
     pass_test = True
     if result == "ip":
-        error = "Wrong ip-number or port"
+        result = "Wrong ip-number or port"
     if result == "apikey":
-        error = "Wrong API key"
-    if result == "restart":
-        error = "Please restart SABnzbd, allow_streaming"
+        result = "Wrong API key"
     if not result == "ok":
-        xbmcgui.Dialog().ok('Pneumatic - SABnzbd error:', error)
+        notification(result, 1000)
         pass_test = False
-    filename = ['plugin.program.pneumatic.test.rar']
-    if not incomplete:
-            pass_test = False
-            xbmcgui.Dialog().ok('Pneumatic', 'No incomplete folder configured')
-    try:
-        write_fake(filename, incomplete)
-    except:
-        pass_test = False
-        xbmcgui.Dialog().ok('Pneumatic - failed to write test file', 'in incomplete folder')
-        log("pass_setup_test: failed to write test file")
-    try:
-        remove_fake(filename, incomplete)
-    except:
-        pass_test = False
-        xbmcgui.Dialog().ok('Pneumatic - failed to remove test file', 'in incomplete folder')
-        log("pass_setup_test: failed to remove test file")
+    log("pass_setup_test: %s" % result)
     return pass_test
 
 def notification(label, duration=500, icon=__icon__):

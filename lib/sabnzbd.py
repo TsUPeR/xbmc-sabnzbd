@@ -350,13 +350,8 @@ class SabnzbdApi:
         return settings_dict
 
     def setup_streaming(self):
-        # 1. test the connection
-        # 2. check allow_streaming
-        # 3. set allow streaming if missing
-        url = self.baseurl + "&mode=version&output=xml"
-        if _load_url(url) is None:
-            utils.log("SABnzbd: setup_streaming: unable to conncet to SABnzbd: %s" % url)
-            return "ip"
+        # 1. check allow_streaming
+        # 2. set allow streaming if missing
         url = self.baseurl + "&mode=get_config&section=misc&keyword=allow_streaming&output=xml"
         doc = _load_xml(url)
         if doc.getElementsByTagName("result"):
@@ -368,6 +363,17 @@ class SabnzbdApi:
             url = self.baseurl + "&mode=set_config&section=misc&keyword=allow_streaming&value=1"
             _load_xml(url)
             return "restart"
+        return "ok"
+
+    def self_test(self):
+        url = self.baseurl + "&mode=version&output=xml"
+        if _load_url(url) is None:
+            utils.log("SABnzbd: setup_streaming: unable to conncet to SABnzbd: %s" % url)
+            return "ip"
+        url = self.baseurl + "&mode=get_config&section=misc&keyword=allow_streaming&output=xml"
+        doc = _load_xml(url)
+        if doc.getElementsByTagName("result"):
+            return "apikey"
         return "ok"
 
 def get_node_value(parent, name, ns=""):
