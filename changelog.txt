@@ -1,3 +1,8 @@
+[B]SABnzbd 3.1.0[/B]
+- Restructure to support Helix
+- Stop import settings from Pneumatic
+- Lots of minor fixes
+
 [B]SABnzbd 3.0.2[/B]
 - Typo stopping propper settings import from Pneumatic
 
