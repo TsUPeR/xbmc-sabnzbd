@@ -31,7 +31,7 @@ from xml.dom.minidom import parseString
 try: import simplejson as json
 except ImportError: import json
 #
-from resources.lib import post_form
+import post_form
 
 import utils
 
