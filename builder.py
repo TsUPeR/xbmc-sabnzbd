@@ -23,21 +23,22 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from resources.lib import sabutils
 import sys
 import xbmcgui
 import xbmcplugin
 
-import utils
 
 BASE = sys.argv[0]
 HANDLE = int(sys.argv[1])
 
+
 class PageBuilder:
-    def __init__ (self):
+    def __init__(self):
         self.items = []
 
     def add(self, **kwargs):
-        utils.log("PageBuilder: add: kwargs: %s" % kwargs)
+        sabutils.log("PageBuilder: add: kwargs: %s" % kwargs)
         info_labels = kwargs.get('info_labels', {'title':'unknown',})
         path = kwargs.get('path', '')
         cm = kwargs.get('cm', [])
@@ -52,7 +53,7 @@ class PageBuilder:
 
     def show(self):
         #items = [(url, listitem, False,)]
-        utils.log("PageBuilder: show:")
+        sabutils.log("PageBuilder: show:")
         xbmcplugin.addDirectoryItems(HANDLE, self.items, len(self.items))
         xbmcplugin.setContent(HANDLE, 'files')
         xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_FILE)
@@ -61,17 +62,18 @@ class PageBuilder:
         xbmcplugin.addSortMethod(HANDLE, xbmcplugin.SORT_METHOD_TITLE)
         xbmcplugin.endOfDirectory(HANDLE, succeeded=True, cacheToDisc=True)
 
+
 class CmBuilder:
     def __init__ (self):
         self.list = []
 
     def add(self, title, path):
-        utils.log("CmBuilder: add: title: %s path: %s" % (title, path))
+        sabutils.log("CmBuilder: add: title: %s path: %s" % (title, path))
         cm_path = "%s?%s" % (BASE, path)
         self.list.append([title , "XBMC.RunPlugin(%s)" % (cm_path)])
 
     def insert_cu(self, pos, title, path):
-        utils.log("CmBuilder: insert_cu: pos: %s title: %s path: %s" % (pos, title, path))
+        sabutils.log("CmBuilder: insert_cu: pos: %s title: %s path: %s" % (pos, title, path))
         self.list.insert(pos, self._cu(title, path))
 
     def _cu(self, title, path):

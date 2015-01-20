@@ -23,48 +23,50 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
+from resources.lib import sabutils
+from resources.lib.sabnzbd import Sabnzbd
+from resources.lib.sabnzbd import Warnings
 import xbmcgui
 
-import utils
-import resources.lib.sabnzbd as sabnzbd
+sabnzbd = Sabnzbd()
+warnings = Warnings()
 
-SABNZBD = sabnzbd.Sabnzbd().init_api
 
 class NzoAction:
     def __init__ (self, **kwargs):
-        utils.log("NzoAction: kwargs: %s" % kwargs)
+        sabutils.log("NzoAction: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def nzo_pause(self):
-        message = SABNZBD.nzo_pause(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Jobb paused: %s" % message)
+        message = sabnzbd.nzo_pause(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Jobb paused: %s" % message)
 
     def nzo_resume(self):
-        message = SABNZBD.nzo_resume(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Jobb resumed: %s" % message)
+        message = sabnzbd.nzo_resume(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Jobb resumed: %s" % message)
 
     def nzo_delete(self):
-        message = SABNZBD.nzo_delete(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Delete: %s" % message)
+        message = sabnzbd.nzo_delete(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Delete: %s" % message)
 
     def nzo_delete_files(self):
-        message = SABNZBD.nzo_delete_files(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Delete: %s" % message)
+        message = sabnzbd.nzo_delete_files(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Delete: %s" % message)
 
     def nzo_delete_history(self):
-        message = SABNZBD.nzo_delete_history(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Remove: %s" % message)
+        message = sabnzbd.nzo_delete_history(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Remove: %s" % message)
 
     def nzo_delete_history_files(self):
-        message = SABNZBD.nzo_delete_history_files(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Remove: %s" % message)
+        message = sabnzbd.nzo_delete_history_files(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Remove: %s" % message)
 
     def nzo_up(self):
         self._switch(-1)
@@ -73,54 +75,55 @@ class NzoAction:
         self._switch(1)
 
     def _switch(self, value):
-        message = SABNZBD.nzo_switch(self.nzo_id, (int(self.index) + value))
-        utils.container_refresh()
+        message = sabnzbd.nzo_switch(self.nzo_id, (int(self.index) + value))
+        sabutils.container_refresh()
 
-    def nzo_category(self):
+    def nzo_change_category(self):
         dialog = xbmcgui.Dialog()
-        category_list = sabnzbd.Queue(SABNZBD).categories
-        utils.log("nzo_category: category_list: %s" % category_list)
+        category_list = sabnzbd.category_list()
+        sabutils.log("nzo_change_category: category_list: %s" % category_list)
         category_list.remove('*')
         category_list.insert(0, 'Default')
-        ret = dialog.select('Select SABnzbd category', category_list)
+        ret = dialog.select('Select sabnzbd category', category_list)
         category_list.remove('Default')
         category_list.insert(0, '*')
         if ret == -1:
             return
         else:
             category = category_list[ret]
-            utils.log("nzo_category: category: %s" % category)
-            message = SABNZBD.nzo_category(self.nzo_id, category)
-            utils.container_refresh()
+            sabutils.log("nzo_change_category: category: %s" % category)
+            message = sabnzbd.nzo_change_category(self.nzo_id, category)
+            sabutils.container_refresh()
 
     def nzo_pp(self):
         dialog = xbmcgui.Dialog()
         pp_list = ['Download', '+Repair', '+Unpack', '+Delete']
-        ret = dialog.select('SABnzbd Post process', pp_list)
-        utils.log("nzo_pp: pp: %s" % ret)
+        ret = dialog.select('sabnzbd Post process', pp_list)
+        sabutils.log("nzo_pp: pp: %s" % ret)
         if ret == -1:
             return
         else:
-            message = SABNZBD.nzo_pp(self.nzo_id, ret)
-            utils.container_refresh()
+            message = sabnzbd.nzo_pp(self.nzo_id, ret)
+            sabutils.container_refresh()
 
     def nzo_retry(self):
         # TODO
         # dialog = xbmcgui.Dialog()
-        # ret = dialog.yesno('SABnzbd Retry', 'Add optional supplemental NZB?', '# TODO')
+        # ret = dialog.yesno('sabnzbd Retry', 'Add optional supplemental NZB?', '# TODO')
         # if ret:
             # dialog = xbmcgui.Dialog()
             # nzb_file = dialog.browse(0, 'Pick a folder', 'files')
             # # XBMC outputs utf-8
             # path = unicode(nzb_file, 'utf-8')
         # else:
-        message = SABNZBD.nzo_retry(self.nzo_id)
-        utils.container_refresh()
-        utils.notification("Retry: %s" % message)
+        message = sabnzbd.nzo_retry(self.nzo_id)
+        sabutils.container_refresh()
+        sabutils.notification("Retry: %s" % message)
+
 
 class NzfAction:
     def __init__ (self, **kwargs):
-        utils.log("NzfAction: kwargs: %s" % kwargs)
+        sabutils.log("NzfAction: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -140,12 +143,13 @@ class NzfAction:
         self._file_list_position(3)
 
     def _file_list_position(self, pos):
-        SABNZBD.file_list_position(self.nzo_id, [self.nzf_id], pos)
-        utils.container_refresh()
+        sabnzbd.file_list_position(self.nzo_id, [self.nzf_id], pos)
+        sabutils.container_refresh()
+
 
 class SabAction:
     def __init__ (self, **kwargs):
-        utils.log("SabAction: kwargs: %s" % kwargs)
+        sabutils.log("SabAction: kwargs: %s" % kwargs)
         self.sab_kwargs = dict()
         for key, value in kwargs.items():
             if key.startswith('sab_'):
@@ -158,61 +162,61 @@ class SabAction:
         dialog = xbmcgui.Dialog()
         nzb_file = dialog.browse(1, 'Add a nzb', 'files', '.nzb|.zip|.gz|.rar')
         path = nzb_file
-        if utils.exists(path):
-            message = SABNZBD.add_file(path)
-            utils.notification("SAB File added")
-            utils.container_refresh()
+        if sabutils.exists(path):
+            sabnzbd.add_file(path)
+            sabutils.notification("SAB File added")
+            sabutils.container_refresh()
 
     def sab_max_speed(self):
         dialog = xbmcgui.Dialog()
-        ret = dialog.numeric(0, 'SABnzbd Max speed  in KB/s')
+        ret = dialog.numeric(0, 'sabnzbd Max speed  in KB/s')
         if ret is not "":
-            message = SABNZBD.max_speed(int(ret))
-            utils.container_refresh()
+            sabnzbd.max_speed(int(ret))
+            sabutils.container_refresh()
 
     def sab_reset_speed(self):
-        message = SABNZBD.reset_speed()
-        utils.container_refresh()
+        sabnzbd.reset_speed()
+        sabutils.container_refresh()
 
     def sab_pause(self):
-        message = SABNZBD.pause()
-        utils.container_refresh()
-        utils.notification("SAB paused: %s" % message)
+        message = sabnzbd.pause()
+        sabutils.container_refresh()
+        sabutils.notification("SAB paused: %s" % message)
 
     def sab_resume(self):
-        message = SABNZBD.resume()
-        utils.container_refresh()
-        utils.notification("Queue resumed: %s" % message)
+        message = sabnzbd.resume()
+        sabutils.container_refresh()
+        sabutils.notification("Queue resumed: %s" % message)
 
     def sab_delete_history_all(self):
         dialog = xbmcgui.Dialog()
-        ret = dialog.yesno('SABnzbd History', 'Remove whole history', 'Are you sure?')
+        ret = dialog.yesno('sabnzbd History', 'Remove whole history', 'Are you sure?')
         if ret:
-            message = SABNZBD.delete_history_all()
-            utils.container_refresh()
-            utils.notification("Remove: %s" % message)
+            message = sabnzbd.delete_history_all()
+            sabutils.container_refresh()
+            sabutils.notification("Remove: %s" % message)
 
     def sab_delete_history_files_all(self):
         dialog = xbmcgui.Dialog()
-        ret = dialog.yesno('SABnzbd History', 'Remove all failed + delete files', 'Are you sure?')
+        ret = dialog.yesno('sabnzbd History', 'Remove all failed + delete files', 'Are you sure?')
         if ret:
-            message = SABNZBD.nzo_delete_history_files_all(self.nzo_id)
-            utils.container_refresh()
-            utils.notification("Remove: %s" % message)
+            message = sabnzbd.delete_history_files_all()
+            sabutils.container_refresh()
+            sabutils.notification("Remove: %s" % message)
 
     def sab_restart(self):
         self.sab_kwargs['mode'] = 'restart'
         message = self.sab_action()
-        utils.parent_dir()
+        sabutils.parent_dir()
 
     def sab_shutdown(self):
         self.sab_kwargs['mode'] = 'shutdown'
         message = self.sab_action()
-        utils.parent_dir()
+        sabutils.parent_dir()
 
     def sab_action(self):
-        return SABNZBD.action(**self.sab_kwargs)
+        return sabnzbd.action(**self.sab_kwargs)
 
     def sab_clear_warnings(self):
-        sabnzbd.Warnings(SABNZBD).clear()
-        utils.parent_dir()
+        warnings.clear()
+        sabutils.parent_dir()

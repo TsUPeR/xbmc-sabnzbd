@@ -23,25 +23,22 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import builder
+from resources.lib import sabutils
+from resources.lib.sabnzbd import Queue, Nzo, History, Warnings
+import time
 import xbmcgui
 
-import time
-
-import utils
-import resources.lib.sabnzbd as sabnzbd
-import builder
-
-SABNZBD = sabnzbd.Sabnzbd().init_api
 
 class Page:
-    def __init__ (self, **kwargs):
-        utils.log("Page: kwargs: %s" % kwargs)
+    def __init__(self, **kwargs):
+        sabutils.log("Page: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def page_main(self):
         page = builder.PageBuilder()
-        queue = sabnzbd.Queue(SABNZBD)
+        queue = Queue()
         # Status
         status = "SABnzbd %s" % queue.version
         if queue.status.lower() == "paused":
@@ -70,10 +67,10 @@ class Page:
         page.show()
 
     def page_refresh(self):
-        utils.container_refresh()
+        sabutils.container_refresh()
 
     def page_parent_dir(self):
-        utils.parent_dir()
+        sabutils.parent_dir()
 
     def _cm_status(self, queue):
         if queue.status.lower() == "paused":
@@ -103,7 +100,7 @@ class Page:
         cm_nzo_details = [pause_resume,
                           ("Move up", "&mode=nzo_up&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),
                           ("Move down", "&mode=nzo_down&nzo_id=%s&index=%s" % (nzo.nzo_id, nzo.index)),
-                          ("Category", "&mode=nzo_category&nzo_id=%s" % nzo.nzo_id),
+                          ("Category", "&mode=nzo_change_category&nzo_id=%s" % nzo.nzo_id),
                           ("Post process", "&mode=nzo_pp&nzo_id=%s" % nzo.nzo_id),
                           ("Delete", "&mode=nzo_delete_files&nzo_id=%s" % nzo.nzo_id)
                          ]
@@ -115,8 +112,7 @@ class Page:
 
     def page_nzo_details(self):
         page = builder.PageBuilder()
-        queue = sabnzbd.Queue(SABNZBD)
-        nzo = sabnzbd.Nzo(SABNZBD, self.nzo_id)
+        nzo = Nzo(self.nzo_id)
         active = [nzf for nzf in nzo.nzf_list() if nzf.status.lower() == "active"]
         for nzf in active:
             title = "%s%% - %s" % (self._quote(nzf.mb, nzf.mbleft), nzf.filename)
@@ -141,11 +137,11 @@ class Page:
         return cm.list
 
     def page_nzf_details(self):
-        utils.container_refresh()
+        sabutils.container_refresh()
 
     def page_history(self):
         page = builder.PageBuilder()
-        queue = sabnzbd.History(SABNZBD, int(self.start), int(self.limit))
+        queue = History(int(self.start), int(self.limit))
         for nzo in queue.nzo_list:
             if nzo.status.lower() == "failed":
                 title = "* Failed - %s" % (nzo.name)
@@ -180,7 +176,7 @@ class Page:
 
     def page_warnings(self):
         page = builder.PageBuilder()
-        warnings = sabnzbd.Warnings(SABNZBD).warnings()
+        warnings = Warnings().warnings()
         for warning in warnings:
             title = "%s" % warning
             path = "&mode=page_parent_dir"
@@ -205,14 +201,15 @@ class Page:
             quote = int(round(100*(mb-mbleft)/mb))
         return str(quote)
 
+
 class Dialog:
     def __init__ (self, **kwargs):
-        utils.log("Dialog: kwargs: %s" % kwargs)
+        sabutils.log("Dialog: kwargs: %s" % kwargs)
         for key, value in kwargs.items():
             setattr(self, key, value)
 
     def dialog_queue_details(self):
-        queue = sabnzbd.Queue(SABNZBD)
+        queue = Queue()
         nzo = queue.nzo(self.nzo_id)
         dialog = xbmcgui.Dialog()
         heading = nzo.filename
@@ -222,7 +219,7 @@ class Dialog:
         ret = dialog.ok(heading, line1, line2, line3)
 
     def dialog_history_details(self):
-        history = sabnzbd.History(SABNZBD, int(self.start), int(self.limit))
+        history = History(int(self.start), int(self.limit))
         nzo = history.nzo(self.nzo_id)
         dialog = xbmcgui.Dialog()
         heading = nzo.name

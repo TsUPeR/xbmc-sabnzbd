@@ -4,7 +4,9 @@ import mimetools
 import mimetypes
 from cStringIO import StringIO
 import urllib2
-import utils
+
+import sabutils
+
 
 def post(path, apikey, url, **kwargs):
     output = kwargs.get('output', 'xml')
@@ -13,7 +15,7 @@ def post(path, apikey, url, **kwargs):
     pp = kwargs.get('pp', '-1')
     nzbname = kwargs.get('nzbname', '')
     form = MultiPartForm() 
-    nzb_data = utils.read(path, 'rb')
+    nzb_data = sabutils.read(path, 'rb')
     form.add_field('apikey', apikey)
     form.add_field('mode', 'addfile')
     form.add_field('output', output)
@@ -28,7 +30,7 @@ def post(path, apikey, url, **kwargs):
     req.add_header('Content-length', len(body))
     req.add_data(body)
     # Dont care about the response
-    utils.load_url(url, req, "SABnzbd failed posting data")
+    sabutils.load_url(url, req, "SABnzbd failed posting data")
     return "ok"
 
 class MultiPartForm(object):

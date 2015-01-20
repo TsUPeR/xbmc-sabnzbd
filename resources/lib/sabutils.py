@@ -26,11 +26,10 @@
 import os
 import urllib
 import urllib2
+import stat
 import xbmc
 import xbmcaddon
 import xbmcvfs
-import stat
-from resources.lib.sabnzbd import Sabnzbd
 
 
 __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
@@ -63,9 +62,8 @@ def get_parameters(parameterString):
     log("get_parameters: commands: %s" % commands)
     return commands
 
-def pass_setup_test():
+def pass_setup_test(result):
     log("pass_setup_test:")
-    result = Sabnzbd().init_api.self_test()
     pass_test = True
     if result == "ip":
         result = "Wrong ip-number or port"
@@ -207,7 +205,7 @@ def mkdirs(path):
     try:
         xbmcvfs.mkdirs(path)
     except:
-        makedirs(path)
+        os.makedirs(path)
     return
 
 def rename(file, name):

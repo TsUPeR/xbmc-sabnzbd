@@ -23,29 +23,34 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import sabpostform
+import sabutils
+import sys
 import urllib
 import urllib2
 import xbmcaddon
 from xml.dom.minidom import parseString
-#
-try: import simplejson as json
-except ImportError: import json
-#
-import post_form
-
-import utils
-
-class Sabnzbd:
-    def __init__ (self):
-        __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
-        self.init_api = SabnzbdApi(__settings__.getSetting("sabnzbd_ip"),
-        __settings__.getSetting("sabnzbd_port"),__settings__.getSetting("sabnzbd_key"),
-        __settings__.getSetting("sabnzbd_user"), __settings__.getSetting("sabnzbd_pass"),
-        __settings__.getSetting("sabnzbd_cat"))
+if sys.version_info >= (2, 7):
+    import json
+else:
+    try:
+        import simplejson as json
+    except ImportError:
+        import json
 
 
-class SabnzbdApi:
-    def __init__ (self, ip, port, apikey, username = None, password = None, category = None):
+class SabnzbdConnection(object):
+    __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
+
+    def __init__(self, ip=__settings__.getSetting("sabnzbd_ip"),
+                  port=__settings__.getSetting("sabnzbd_port"),
+                  apikey=__settings__.getSetting("sabnzbd_key"),
+                  username=__settings__.getSetting("sabnzbd_user"),
+                  password=__settings__.getSetting("sabnzbd_pass"),
+                  category=__settings__.getSetting("sabnzbd_cat")):
+        if not (ip and port and apikey):
+            sabutils.notification("SABnzbd API Error", 1000)
+            raise RuntimeError("Missing, ip, port or API key")
         self.ip = ip
         self.port = port
         self.apikey = apikey
@@ -60,11 +65,16 @@ class SabnzbdApi:
         self.category = category
         self.kwargs = dict()
 
+
+class Sabnzbd(SabnzbdConnection):
+    def __init__(self):
+        super(Sabnzbd, self).__init__()
+
     def action(self, **kwargs):
         self.kwargs.update(**kwargs)
         url = "%s&%s" % (self.baseurl, urllib.urlencode(self.kwargs))
         responseMessage = self._sabResponse(url)
-        return responseMessage
+        return responseMessage.replace('\n', '')
 
     def addurl(self, nzb, nzbname, **kwargs):
         category = kwargs.get('category', None)
@@ -96,7 +106,7 @@ class SabnzbdApi:
         
     def add_file(self, path, **kwargs):
         url = "%s&mode=addfile" % self.baseurl
-        responseMessage = post_form.post(path, self.apikey, url, **kwargs)
+        responseMessage = sabpostform.post(path, self.apikey, url, **kwargs)
         return responseMessage
 
     def max_speed(self, speed):
@@ -175,7 +185,7 @@ class SabnzbdApi:
         self.kwargs['value2'] = value
         return self.action()
 
-    def nzo_category(self, nzo_id, category='*'):
+    def nzo_change_category(self, nzo_id, category='*'):
         self.kwargs['mode'] = 'change_cat'
         self.kwargs['value'] = nzo_id
         self.kwargs['value2'] = category
@@ -192,19 +202,10 @@ class SabnzbdApi:
         self.kwargs['value'] = nzo_id
         return self.action()
 
-    def nzo_set_streaming(self, nzo_id):
-        pp_message = self.nzo_pp(nzo_id,0)
-        switch_message = self.switch(nzo_id, 0)
-        if "ok" in (pp_message and switch_message):
-            message = "ok"
-        else:
-            message = "failed nzo_set_streaming"
-        return message
-
     def _sabResponse(self, url):
         responseMessage = _load_url(url)
-        utils.log("SABnzbd: _sabResponse message: %s" % responseMessage)
-        utils.log("SABnzbd: _sabResponse from url: %s" % url)
+        sabutils.log("SABnzbd: _sabResponse message: %s" % responseMessage)
+        sabutils.log("SABnzbd: _sabResponse from url: %s" % url)
         return responseMessage
 
     def nzo_id(self, nzbname, nzb = None):
@@ -254,7 +255,7 @@ class SabnzbdApi:
             try:
                 sab_nzf_id_list.append(file_nzf[filename])
             except:
-                utils.log("SABnzbd: nzf_id_list: unable to find sab_nzf_id for: %s" % filename)
+                sabutils.log("SABnzbd: nzf_id_list: unable to find sab_nzf_id for: %s" % filename)
         return sab_nzf_id_list
 
     def nzo_id_history(self, nzbname):
@@ -332,8 +333,16 @@ class SabnzbdApi:
               + self.apikey + "&action_key=" + action[position]
         for nzf_id in sab_nzf_id:
             url = url + "&" + nzf_id + "=on"
-        utils.load_url(url, None, "SABnzbd failed moving file to top of queue")
+        sabutils.load_url(url, None, "SABnzbd failed moving file to top of queue")
         return
+
+    def category_list(self):
+        url = self.baseurl + "&mode=get_cats&output=json"
+        doc = _load_json(url)
+        if doc:
+            return doc["categories"]
+        else:
+            return ["*"]
 
     def misc_settings_dict(self):
         url = self.baseurl + "&mode=get_config&section=misc&output=xml"
@@ -367,7 +376,7 @@ class SabnzbdApi:
     def self_test(self):
         url = self.baseurl + "&mode=version&output=xml"
         if _load_url(url) is None:
-            utils.log("SABnzbd: setup_streaming: unable to conncet to SABnzbd: %s" % url)
+            sabutils.log("SABnzbd: setup_streaming: unable to conncet to SABnzbd: %s" % url)
             return "ip"
         url = self.baseurl + "&mode=get_config&section=misc&keyword=allow_streaming&output=xml"
         doc = _load_xml(url)
@@ -375,49 +384,55 @@ class SabnzbdApi:
             return "apikey"
         return "ok"
 
+
 def get_node_value(parent, name, ns=""):
     if ns:
         return unicode(parent.getElementsByTagNameNS(ns, name)[0].childNodes[0].data.encode('utf-8'), 'utf-8')
     else:
         return unicode(parent.getElementsByTagName(name)[0].childNodes[0].data.encode('utf-8'), 'utf-8')
 
+
 def _load_url(url):
-        utils.log("SABnzbd: _load_url: ")
-        return utils.load_url(url)
+        sabutils.log("SABnzbd: _load_url: ")
+        return sabutils.load_url(url)
+
 
 def _load_xml(url):
-    utils.log("SABnzbd: _load_xml: ")
+    sabutils.log("SABnzbd: _load_xml: ")
     try:
         out = parseString(_load_url(url))
     except:
-        utils.log("SABnzbd: _load_xml: malformed xml from url: %s" % url)
-        utils.notification("SABnzbd malformed xml")
+        sabutils.log("SABnzbd: _load_xml: malformed xml from url: %s" % url)
+        sabutils.notification("SABnzbd malformed xml")
         return None
     return out
 
+
 def _load_json(url):
-    utils.log("SABnzbd: _load_json: url: %s" % url)
+    sabutils.log("SABnzbd: _load_json: url: %s" % url)
     try:
         out = json.loads(_load_url(url))
     except:
-        utils.log("SABnzbd: _load_json: malformed json from url: %s" % url)
-        utils.notification("SABnzbd malformed json")
+        sabutils.log("SABnzbd: _load_json: malformed json from url: %s" % url)
+        sabutils.notification("SABnzbd malformed json")
         return None
     return out
 
-class Queue:
-    def __init__(self, sabnzbd, start=0, limit=50):
-        self.sabnzbd = sabnzbd
+
+class Queue(SabnzbdConnection):
+    def __init__(self, start=0, limit=50):
+        super(Queue, self).__init__()
         self.nzo_list = []
+        self.slots = None
         url = "%s&mode=queue&start=%s&limit=%s&output=json" % \
-              (self.sabnzbd.baseurl, start, limit)
+              (self.baseurl, start, limit)
         doc = _load_json(url)
         if doc:
             for key, value in doc["queue"].items():
                 setattr(self, key, value)
-            if self.slots:
+            if self.slots is not None:
                 for slot in self.slots:
-                    nzo = NzoObject(slot)
+                    nzo = NzoListObject(slot)
                     self.nzo_list.append(nzo)
 
     def nzo(self, nzo_id):
@@ -428,25 +443,28 @@ class Queue:
                 pass
         return None
 
-class NzoObject:
+
+class NzoListObject:
     def __init__(self, slot):
         for key, value in slot.items():
             setattr(self, key, value)
 
-class History:
-    def __init__(self, sabnzbd, start=0, limit=50):
-        self.sabnzbd = sabnzbd
+
+class History(SabnzbdConnection):
+    def __init__(self, start=0, limit=50):
+        super(History, self).__init__()
         self.failed_only = 0
         self.nzo_list = []
+        self.slots = None
         url = "%s&mode=history&start=%s&limit=%s&failed_only=%s&output=json" % \
-              (self.sabnzbd.baseurl, start, limit, self.failed_only)
+              (self.baseurl, start, limit, self.failed_only)
         doc = _load_json(url)
         if doc:
             for key, value in doc["history"].items():
                 setattr(self, key, value)
-            if self.slots:
+            if self.slots is not None:
                 for slot in self.slots:
-                    nzo = NzoObject(slot)
+                    nzo = NzoListObject(slot)
                     self.nzo_list.append(nzo)
         self.len_slots = len(self.nzo_list)
 
@@ -458,19 +476,24 @@ class History:
                 pass
         return None
 
+
 class Nzo(Queue):
-    # legacy class present due to pneumatic
-    def __init__(self, sabnzbd, nzo_id):
-        self.is_in_queue = False
-        Queue.__init__(self, sabnzbd)
-        import inspect
-        for n, v in inspect.getmembers(self.nzo(nzo_id)):
-            setattr(self, n, v)
-    
+    def __init__(self, nzo_id):
+        super(Nzo, self).__init__()
+        self.nzo_id = nzo_id
+        nzo_list_object = self.nzo(nzo_id)
+        if nzo_list_object is None:
+            self.is_in_queue = False
+        else:
+            self.is_in_queue = True
+            import inspect
+            for n, v in inspect.getmembers(nzo_list_object):
+                setattr(self, n, v)
+
     def _get_nzf_list(self):
         out_list = []
         out_dict = dict()
-        url = "%s&mode=get_files&output=json&value=%s" % (self.sabnzbd.baseurl, str(self.nzo_id))
+        url = "%s&mode=get_files&output=json&value=%s" % (self.baseurl, str(self.nzo_id))
         doc = _load_json(url)
         if doc:
             files = doc["files"]
@@ -506,6 +529,7 @@ class Nzo(Queue):
                 break
         return out
 
+
 class Nzf:
     def __init__(self, **kwargs):
         self.status = kwargs.get('status')
@@ -518,23 +542,23 @@ class Nzf:
         self.nzf_id = kwargs.get('nzf_id', None)
         self.id = kwargs.get('id')
 
-class Warnings:
-    def __init__(self, sabnzbd):
-        self.sabnzbd = sabnzbd
+class Warnings(SabnzbdConnection):
+    def __init__(self):
+        super(Warnings, self).__init__()
 
     def warnings(self):
-        url = "%s&mode=warnings&output=json" % self.sabnzbd.baseurl
+        url = "%s&mode=warnings&output=json" % self.baseurl
         doc = _load_json(url)
         if doc:
             out = []
             for i in range(len(doc['warnings'])):
                 out.append(doc['warnings'][i].replace('\n', ' '))
-                i+=1
+                i += 1
             return out
         else:
             return []
 
     def clear(self):
         url = "http://%s:%s/status/clearwarnings?session=%s" % \
-              (self.sabnzbd.ip, self.sabnzbd.port, self.sabnzbd.apikey)
+              (self.ip, self.port, self.apikey)
         _load_url(url)

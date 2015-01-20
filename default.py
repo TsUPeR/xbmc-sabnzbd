@@ -23,28 +23,29 @@
  OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import action
+import page
+from resources.lib import sabutils
+from resources.lib.sabnzbd import Sabnzbd
+import sys
 import xbmc
 import xbmcaddon
-
-import utils
-import page
-import action
 
 __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
 __language__ = __settings__.getLocalizedString
 
 if (__name__ == "__main__" ):
-    utils.log('v%s started' % __settings__.getAddonInfo("version"), xbmc.LOGNOTICE)
+    sabutils.log('v%s started' % __settings__.getAddonInfo("version"), xbmc.LOGNOTICE)
     HANDLE = int(sys.argv[1])
     if not (__settings__.getSetting("firstrun")):
         __settings__.openSettings()
-        if utils.pass_setup_test():
+        if sabutils.pass_setup_test(Sabnzbd().self_test()):
             __settings__.setSetting("firstrun", '1')
     else:
         if (not sys.argv[2]):
             page.Page().page_main()
         else:
-            params = utils.get_parameters(sys.argv[2])
+            params = sabutils.get_parameters(sys.argv[2])
             get = params.get
             mode = get("mode")
             if mode.startswith("page_"):
