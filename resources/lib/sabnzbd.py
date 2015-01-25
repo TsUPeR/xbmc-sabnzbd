@@ -41,23 +41,28 @@ else:
 
 class SabnzbdConnection(object):
     __settings__ = xbmcaddon.Addon(id='plugin.program.sabnzbd')
+    use_https = __settings__.getSetting("sabnzbd_https").lower() == "true"
 
     def __init__(self, ip=__settings__.getSetting("sabnzbd_ip"),
                   port=__settings__.getSetting("sabnzbd_port"),
                   apikey=__settings__.getSetting("sabnzbd_key"),
                   username=__settings__.getSetting("sabnzbd_user"),
                   password=__settings__.getSetting("sabnzbd_pass"),
-                  category=__settings__.getSetting("sabnzbd_cat")):
+                  category=None, use_https=use_https):
         if not (ip and port and apikey):
             sabutils.notification("SABnzbd API Error", 1000)
             raise RuntimeError("Missing, ip, port or API key")
         self.ip = ip
         self.port = port
         self.apikey = apikey
-        self.baseurl = "http://" + self.ip + ":" + self.port + "/api?apikey=" + apikey
+        if use_https:
+            https_string = "https://"
+        else:
+            https_string = "http://"
+        self.baseurl = https_string + self.ip + ":" + self.port + "/api?apikey=" + apikey
         if username and password:
             password_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            url = "http://" + self.ip + ":" + self.port
+            url = https_string + self.ip + ":" + self.port
             password_manager.add_password(None, url, username, password)
             authhandler = urllib2.HTTPBasicAuthHandler(password_manager)
             opener = urllib2.build_opener(authhandler)
