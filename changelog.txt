@@ -1,3 +1,7 @@
+[B]SABnzbd 3.2.0[/B]
+- Enable https
+- Work as proper python module
+
 [B]SABnzbd 3.1.0[/B]
 - Restructure to support Helix
 - Stop import settings from Pneumatic
